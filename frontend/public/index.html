@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="Human Resource Management System - Complete HRMS solution for employee management" />
+    <meta name="keywords" content="HRMS, Human Resources, Employee Management, HR Software" />
+    <meta name="author" content="HRMS Team" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="HRMS - Human Resource Management System" />
+    <meta property="og:description" content="Complete HRMS solution for employee management" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:title" content="HRMS - Human Resource Management System" />
+    <meta property="twitter:description" content="Complete HRMS solution for employee management" />
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    
+    <!-- Manifest -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    
+    <!-- Preconnect to external domains for better performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <title>HRMS - Human Resource Management System</title>
+    
+    <style>
+      /* Reset and base styles */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      html {
+        height: 100%;
+        scroll-behavior: smooth;
+      }
+      
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        background-color: #f8fafc;
+        color: #1a202c;
+        line-height: 1.6;
+        height: 100%;
+        overflow-x: hidden;
+      }
+      
+      /* Loading screen styles */
+      .initial-loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        z-index: 9999;
+        transition: opacity 0.5s ease-out;
+      }
+      
+      .loading-spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        border-top: 4px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 20px;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      .loading-text {
+        font-size: 18px;
+        font-weight: 500;
+        margin-bottom: 10px;
+      }
+      
+      .loading-subtext {
+        font-size: 14px;
+        opacity: 0.8;
+      }
+      
+      /* Root container */
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Code font */
+      code {
+        font-family: 'SF Mono', Monaco, Inconsolata, 'Roboto Mono', 'Courier New', monospace;
+        background-color: #f7fafc;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-size: 0.875em;
+      }
+      
+      /* Noscript message */
+      noscript {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: #1a202c;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 20px;
+        z-index: 10000;
+      }
+      
+      noscript h1 {
+        font-size: 24px;
+        margin-bottom: 16px;
+        color: #f56565;
+      }
+      
+      noscript p {
+        font-size: 16px;
+        line-height: 1.5;
+        max-width: 500px;
+      }
+      
+      /* Error boundary styles */
+      .error-boundary {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        text-align: center;
+        background: #f8fafc;
+      }
+      
+      .error-boundary h1 {
+        color: #e53e3e;
+        font-size: 24px;
+        margin-bottom: 16px;
+      }
+      
+      .error-boundary p {
+        color: #4a5568;
+        margin-bottom: 20px;
+        max-width: 500px;
+      }
+      
+      .error-boundary button {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+      }
+      
+      .error-boundary button:hover {
+        background: #5a67d8;
+      }
+      
+      /* Responsive adjustments */
+      @media (max-width: 768px) {
+        .loading-text {
+          font-size: 16px;
+        }
+        
+        .loading-subtext {
+          font-size: 12px;
+        }
+        
+        .error-boundary h1 {
+          font-size: 20px;
+        }
+      }
+      
+      /* Print styles */
+      @media print {
+        body {
+          background: white !important;
+          color: black !important;
+        }
+        
+        .initial-loading,
+        .error-boundary {
+          display: none !important;
+        }
+      }
+      
+      /* High contrast mode support */
+      @media (prefers-contrast: high) {
+        body {
+          background: white;
+          color: black;
+        }
+      }
+      
+      /* Reduced motion support */
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        
+        html {
+          scroll-behavior: auto;
+        }
+      }
+      
+      /* Focus visible support for better accessibility */
+      .js-focus-visible :focus:not(.focus-visible) {
+        outline: none;
+      }
+      
+      /* Custom scrollbar for webkit browsers */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      
+      ::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+      }
+      
+      ::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+      }
+    </style>
+  </head>
+  <body>
+    <noscript>
+      <h1>⚠️ JavaScript Required</h1>
+      <p>
+        This HRMS application requires JavaScript to function properly. 
+        Please enable JavaScript in your browser settings and reload the page.
+      </p>
+      <p>
+        If you're using a modern browser, JavaScript should be enabled by default. 
+        If you're having trouble, try updating your browser or contact your system administrator.
+      </p>
+    </noscript>
+    
+    <!-- Initial loading screen -->
+    <div id="initial-loading" class="initial-loading">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">Loading HRMS</div>
+      <div class="loading-subtext">Please wait while we prepare your workspace...</div>
+    </div>
+    
+    <!-- Main React app container -->
+    <div id="root"></div>
+    
+    <script>
+      // Remove loading screen once React loads
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          const loadingScreen = document.getElementById('initial-loading');
+          if (loadingScreen) {
+            loadingScreen.style.opacity = '0';
+            setTimeout(function() {
+              loadingScreen.style.display = 'none';
+            }, 500);
+          }
+        }, 1000);
+      });
+      
+      // Global error handler
+      window.addEventListener('error', function(e) {
+        console.error('Global error:', e.error);
+      });
+      
+      // Unhandled promise rejection handler
+      window.addEventListener('unhandledrejection', function(e) {
+        console.error('Unhandled promise rejection:', e.reason);
+      });
+      
+      // Service Worker registration (for future PWA features)
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          // Uncomment the following lines if you want to register a service worker
+          // navigator.serviceWorker.register('/sw.js')
+          //   .then(function(registration) {
+          //     console.log('SW registered: ', registration);
+          //   })
+          //   .catch(function(registrationError) {
+          //     console.log('SW registration failed: ', registrationError);
+          //   });
+        });
+      }
+      
+      // Basic analytics tracking (replace with your preferred analytics)
+      function trackEvent(eventName, properties = {}) {
+        console.log('Event:', eventName, properties);
+        // Add your analytics code here (Google Analytics, Mixpanel, etc.)
+      }
+      
+      // Track page load time
+      window.addEventListener('load', function() {
+        const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+        trackEvent('page_load_time', { load_time: loadTime });
+      });
+    </script>
+  </body>
+</html>
