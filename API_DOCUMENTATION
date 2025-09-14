@@ -1,0 +1,704 @@
+# HRMS API Documentation
+
+## 📋 Overview
+
+This documentation covers all API endpoints for the Human Resource Management System (HRMS). The API provides authentication, employee management, and dashboard functionality.
+
+**Base URL:** `http://localhost:5000/api`
+
+**Authentication:** JWT Bearer Token
+
+---
+
+## 🔐 Authentication Endpoints
+
+### 1. Register User
+
+**Endpoint:** `POST /auth/register`
+
+**Description:** Register a new user. If registering as employee, also creates employee record.
+
+**Access:** Public
+
+**Request Body:**
+```json
+{
+  "name": "John Doe",
+  "email": "john.doe@company.com",
+  "password": "password123",
+  "role": "employee", // "employee" | "hr" | "admin"
+  "employeeData": { // Optional, only for employee registration
+    "firstName": "John",
+    "lastName": "Doe",
+    "phone": "+1234567890",
+    "department": "IT",
+    "position": "Software Engineer",
+    "salary": 75000,
+    "hireDate": "2024-01-15",
+    "address": {
+      "street": "123 Main St",
+      "city": "New York",
+      "state": "NY",
+      "zipCode": "10001",
+      "country": "USA"
+    },
+    "emergencyContact": {
+      "name": "Jane Doe",
+      "relationship": "Spouse",
+      "phone": "+1234567891"
+    }
+  }
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "message": "User registered successfully",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "64f5a1b2c8d4e5f6a7b8c9d0",
+    "name": "John Doe",
+    "email": "john.doe@company.com",
+    "role": "employee"
+  }
+}
+```
+
+**Error Responses:**
+- `400` - User already exists, validation errors
+- `500` - Server error
+
+---
+
+### 2. Login User
+
+**Endpoint:** `POST /auth/login`
+
+**Description:** Authenticate user and get JWT token
+
+**Access:** Public
+
+**Request Body:**
+```json
+{
+  "email": "john.doe@company.com",
+  "password": "password123"
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "message": "Login successful",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "id": "64f5a1b2c8d4e5f6a7b8c9d0",
+    "name": "John Doe",
+    "email": "john.doe@company.com",
+    "role": "employee"
+  }
+}
+```
+
+**Error Responses:**
+- `401` - Invalid credentials, account deactivated
+- `500` - Server error
+
+---
+
+### 3. Get Current User
+
+**Endpoint:** `GET /auth/me`
+
+**Description:** Get current authenticated user information
+
+**Access:** Private (All authenticated users)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Success Response (200):**
+```json
+{
+  "user": {
+    "id": "64f5a1b2c8d4e5f6a7b8c9d0",
+    "name": "John Doe",
+    "email": "john.doe@company.com",
+    "role": "employee"
+  }
+}
+```
+
+**Error Responses:**
+- `401` - Invalid or expired token
+- `500` - Server error
+
+---
+
+## 👥 Employee Management Endpoints
+
+### 1. Get All Employees
+
+**Endpoint:** `GET /employees`
+
+**Description:** Get paginated list of employees with search and filter options
+
+**Access:** Private (All authenticated users)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Query Parameters:**
+```
+page=1            // Page number (default: 1)
+limit=10          // Items per page (default: 10)
+search=john       // Search in name, email, employeeId
+department=IT     // Filter by department
+status=Active     // Filter by status
+```
+
+**Example Request:**
+```
+GET /employees?page=1&limit=5&search=john&department=IT&status=Active
+```
+
+**Success Response (200):**
+```json
+{
+  "employees": [
+    {
+      "_id": "64f5a1b2c8d4e5f6a7b8c9d0",
+      "employeeId": "EMP0001",
+      "firstName": "John",
+      "lastName": "Smith",
+      "email": "john.smith@company.com",
+      "phone": "+1234567890",
+      "department": "IT",
+      "position": "Senior Developer",
+      "salary": 75000,
+      "hireDate": "2022-01-15T00:00:00.000Z",
+      "status": "Active",
+      "address": {
+        "street": "123 Main St",
+        "city": "New York",
+        "state": "NY",
+        "zipCode": "10001",
+        "country": "USA"
+      },
+      "emergencyContact": {
+        "name": "Jane Smith",
+        "relationship": "Spouse",
+        "phone": "+1234567891"
+      },
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z"
+    }
+  ],
+  "totalPages": 3,
+  "currentPage": 1,
+  "total": 25
+}
+```
+
+**Error Responses:**
+- `401` - Unauthorized
+- `500` - Server error
+
+---
+
+### 2. Get Single Employee
+
+**Endpoint:** `GET /employees/:id`
+
+**Description:** Get detailed information about a specific employee
+
+**Access:** Private (All authenticated users)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**URL Parameters:**
+- `id` (string) - Employee MongoDB ObjectId
+
+**Success Response (200):**
+```json
+{
+  "_id": "64f5a1b2c8d4e5f6a7b8c9d0",
+  "employeeId": "EMP0001",
+  "firstName": "John",
+  "lastName": "Smith",
+  "email": "john.smith@company.com",
+  "phone": "+1234567890",
+  "department": "IT",
+  "position": "Senior Developer",
+  "salary": 75000,
+  "hireDate": "2022-01-15T00:00:00.000Z",
+  "status": "Active",
+  "address": {
+    "street": "123 Main St",
+    "city": "New York",
+    "state": "NY",
+    "zipCode": "10001",
+    "country": "USA"
+  },
+  "emergencyContact": {
+    "name": "Jane Smith",
+    "relationship": "Spouse",
+    "phone": "+1234567891"
+  },
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "updatedAt": "2024-01-15T10:30:00.000Z"
+}
+```
+
+**Error Responses:**
+- `401` - Unauthorized
+- `404` - Employee not found
+- `500` - Server error
+
+---
+
+### 3. Get My Profile
+
+**Endpoint:** `GET /employees/my-profile`
+
+**Description:** Get current user's employee profile
+
+**Access:** Private (All authenticated users)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Success Response (200):**
+```json
+{
+  "employee": {
+    "_id": "64f5a1b2c8d4e5f6a7b8c9d0",
+    "employeeId": "EMP0001",
+    "firstName": "John",
+    "lastName": "Smith",
+    "email": "john.smith@company.com",
+    // ... full employee object
+  },
+  "message": "Profile retrieved successfully"
+}
+```
+
+**Error Responses:**
+- `401` - Unauthorized
+- `404` - Employee profile not found
+- `500` - Server error
+
+---
+
+### 4. Create Employee
+
+**Endpoint:** `POST /employees`
+
+**Description:** Create a new employee record (HR/Admin only)
+
+**Access:** Private (HR and Admin only)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Request Body:**
+```json
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "jane.doe@company.com",
+  "phone": "+1234567892",
+  "department": "HR",
+  "position": "HR Specialist",
+  "salary": 55000,
+  "hireDate": "2024-03-20",
+  "status": "Active",
+  "address": {
+    "street": "456 Oak Ave",
+    "city": "Los Angeles",
+    "state": "CA",
+    "zipCode": "90210",
+    "country": "USA"
+  },
+  "emergencyContact": {
+    "name": "John Doe",
+    "relationship": "Spouse",
+    "phone": "+1234567893"
+  }
+}
+```
+
+**Success Response (201):**
+```json
+{
+  "message": "Employee created successfully",
+  "employee": {
+    "_id": "64f5a1b2c8d4e5f6a7b8c9d1",
+    "employeeId": "EMP0008", // Auto-generated
+    "firstName": "Jane",
+    "lastName": "Doe",
+    // ... full employee object
+  }
+}
+```
+
+**Error Responses:**
+- `400` - Validation errors, duplicate email
+- `401` - Unauthorized
+- `403` - Insufficient permissions
+- `500` - Server error
+
+---
+
+### 5. Update Employee
+
+**Endpoint:** `PUT /employees/:id`
+
+**Description:** Update an existing employee record (HR/Admin only)
+
+**Access:** Private (HR and Admin only)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**URL Parameters:**
+- `id` (string) - Employee MongoDB ObjectId
+
+**Request Body:**
+```json
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "phone": "+1234567899", // Updated field
+  "department": "Marketing", // Updated field
+  "position": "Marketing Manager", // Updated field
+  "salary": 65000, // Updated field
+  // Include other fields to update
+}
+```
+
+**Success Response (200):**
+```json
+{
+  "message": "Employee updated successfully",
+  "employee": {
+    "_id": "64f5a1b2c8d4e5f6a7b8c9d1",
+    "employeeId": "EMP0008",
+    // ... updated employee object
+  }
+}
+```
+
+**Error Responses:**
+- `400` - Validation errors, duplicate email
+- `401` - Unauthorized
+- `403` - Insufficient permissions
+- `404` - Employee not found
+- `500` - Server error
+
+---
+
+### 6. Delete Employee
+
+**Endpoint:** `DELETE /employees/:id`
+
+**Description:** Delete an employee record (Admin only)
+
+**Access:** Private (Admin only)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**URL Parameters:**
+- `id` (string) - Employee MongoDB ObjectId
+
+**Success Response (200):**
+```json
+{
+  "message": "Employee deleted successfully"
+}
+```
+
+**Error Responses:**
+- `401` - Unauthorized
+- `403` - Insufficient permissions (only Admin can delete)
+- `404` - Employee not found
+- `500` - Server error
+
+---
+
+### 7. Get Dashboard Statistics
+
+**Endpoint:** `GET /employees/stats`
+
+**Description:** Get employee statistics for dashboard
+
+**Access:** Private (All authenticated users)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+```
+
+**Success Response (200):**
+```json
+{
+  "totalEmployees": 25,
+  "activeEmployees": 23,
+  "inactiveEmployees": 1,
+  "terminatedEmployees": 1,
+  "departmentStats": [
+    {
+      "_id": "IT",
+      "count": 8
+    },
+    {
+      "_id": "Marketing",
+      "count": 5
+    },
+    {
+      "_id": "Finance",
+      "count": 4
+    },
+    {
+      "_id": "HR",
+      "count": 3
+    },
+    {
+      "_id": "Sales",
+      "count": 3
+    },
+    {
+      "_id": "Operations",
+      "count": 2
+    }
+  ]
+}
+```
+
+**Error Responses:**
+- `401` - Unauthorized
+- `500` - Server error
+
+---
+
+## 🔒 Authorization Levels
+
+### User Roles and Permissions
+
+| Endpoint | Employee | HR | Admin |
+|----------|----------|-----|-------|
+| GET /employees | ✅ | ✅ | ✅ |
+| GET /employees/:id | ✅ | ✅ | ✅ |
+| GET /employees/my-profile | ✅ | ✅ | ✅ |
+| GET /employees/stats | ✅ | ✅ | ✅ |
+| POST /employees | ❌ | ✅ | ✅ |
+| PUT /employees/:id | ❌ | ✅ | ✅ |
+| DELETE /employees/:id | ❌ | ❌ | ✅ |
+
+---
+
+## 📊 Data Models
+
+### User Model
+```typescript
+interface User {
+  _id: string;
+  name: string;
+  email: string; // unique
+  password: string; // hashed
+  role: 'employee' | 'hr' | 'admin';
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+### Employee Model
+```typescript
+interface Employee {
+  _id: string;
+  employeeId: string; // unique, auto-generated (EMP0001, EMP0002, etc.)
+  firstName: string;
+  lastName: string;
+  email: string; // unique
+  phone: string;
+  department: 'IT' | 'HR' | 'Finance' | 'Marketing' | 'Operations' | 'Sales';
+  position: string;
+  salary: number;
+  hireDate: Date;
+  status: 'Active' | 'Inactive' | 'Terminated';
+  address: {
+    street?: string;
+    city?: string;
+    state?: string;
+    zipCode?: string;
+    country?: string;
+  };
+  emergencyContact: {
+    name?: string;
+    relationship?: string;
+    phone?: string;
+  };
+  createdAt: Date;
+  updatedAt: Date;
+}
+```
+
+---
+
+## ❌ Error Response Format
+
+All error responses follow this consistent format:
+
+```json
+{
+  "message": "Error description",
+  "errors": ["Detailed error messages"], // Optional, for validation errors
+  "field": "fieldName" // Optional, for duplicate field errors
+}
+```
+
+### Common HTTP Status Codes
+
+- **200** - Success
+- **201** - Created
+- **400** - Bad Request (validation errors, duplicate data)
+- **401** - Unauthorized (invalid/missing token)
+- **403** - Forbidden (insufficient permissions)
+- **404** - Not Found
+- **500** - Internal Server Error
+
+---
+
+## 🔧 Development & Testing
+
+### Environment Variables
+```env
+PORT=5000
+MONGODB_URI=mongodb://localhost:27017/hrms
+JWT_SECRET=your_super_secret_jwt_key_here
+NODE_ENV=development
+```
+
+### Test Credentials
+
+**Admin User:**
+- Email: `admin@hrms.com`
+- Password: `admin123`
+- Role: `admin`
+
+**HR User:**
+- Email: `hr@hrms.com`
+- Password: `hr123`
+- Role: `hr`
+
+**Employee User:**
+- Email: `employee@hrms.com`
+- Password: `employee123`
+- Role: `employee`
+
+### Sample cURL Commands
+
+**Login:**
+```bash
+curl -X POST http://localhost:5000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"hr@hrms.com","password":"hr123"}'
+```
+
+**Get Employees:**
+```bash
+curl -X GET "http://localhost:5000/api/employees?page=1&limit=5" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+```
+
+**Create Employee:**
+```bash
+curl -X POST http://localhost:5000/api/employees \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
+  -d '{
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@company.com",
+    "phone": "+1234567890",
+    "department": "IT",
+    "position": "Developer",
+    "salary": 70000,
+    "hireDate": "2024-01-15"
+  }'
+```
+
+---
+
+## 🚀 API Usage Examples
+
+### JavaScript/Frontend Usage
+
+```javascript
+// Login
+const loginResponse = await fetch('/api/auth/login', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    email: 'hr@hrms.com',
+    password: 'hr123'
+  })
+});
+
+const { token } = await loginResponse.json();
+
+// Get employees with auth token
+const employeesResponse = await fetch('/api/employees?page=1&limit=10', {
+  headers: { 'Authorization': `Bearer ${token}` }
+});
+
+const { employees } = await employeesResponse.json();
+```
+
+### Rate Limiting
+Currently no rate limiting is implemented, but it's recommended for production use.
+
+### CORS
+CORS is configured to allow requests from:
+- `http://localhost:3000` (React development server)
+- `http://127.0.0.1:3000`
+
+---
+
+## 📈 Future Enhancements
+
+Potential API extensions:
+- File upload endpoints for employee photos
+- Leave management endpoints
+- Performance review endpoints
+- Payroll endpoints
+- Department management endpoints
+- Bulk operations (import/export employees)
+- Advanced filtering and sorting
+- API versioning
+- Rate limiting
+- API documentation with Swagger/OpenAPI
+
+---
+
+**API Version:** 1.0.0  
+**Last Updated:** December 2024  
+**Base URL:** `http://localhost:5000/api`
