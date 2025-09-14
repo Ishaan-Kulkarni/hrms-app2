@@ -117,7 +117,7 @@ const EmployeeDetail = ({ employee, onClose }) => {
 
           {/* Timestamps */}
           <div>
-            <h3 style={{ color: '#2d3748', marginBottom: '15px' }}>System Information</h3>
+            <h3 style={{ color: '#2d3748', marginBottom: '15px' }}>Sssssystem Information</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
               <div>
                 <label style={{ fontWeight: '500', color: '#4a5568' }}>Created Date:</label>

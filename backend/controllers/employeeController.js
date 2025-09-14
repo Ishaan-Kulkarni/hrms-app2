@@ -62,11 +62,48 @@ const getEmployee = async (req, res) => {
   }
 };
 
+// Get current user's employee profile
+const getMyProfile = async (req, res) => {
+  try {
+    const userEmail = req.user.email;
+    console.log('Getting profile for user email:', userEmail);
+    
+    const employee = await Employee.findOne({ email: userEmail });
+    
+    if (!employee) {
+      return res.status(404).json({ 
+        message: 'Employee profile not found. Please contact HR to create your employee record.' 
+      });
+    }
+
+    res.json({ 
+      employee,
+      message: 'Profile retrieved successfully' 
+    });
+  } catch (error) {
+    console.error('Get my profile error:', error);
+    res.status(500).json({ message: 'Server error while fetching your profile' });
+  }
+};
+
 // Create employee
 const createEmployee = async (req, res) => {
   try {
-    const employee = new Employee(req.body);
+    // Generate employeeId manually
+    const employeeCount = await Employee.countDocuments();
+    const employeeId = `EMP${String(employeeCount + 1).padStart(4, '0')}`;
+    
+    console.log('Creating employee with ID:', employeeId);
+    
+    const employee = new Employee({
+      ...req.body,
+      employeeId: employeeId,
+      status: req.body.status || 'Active' // Default to Active if not provided
+    });
+    
     await employee.save();
+    
+    console.log('Employee created successfully:', employee.employeeId);
     
     res.status(201).json({
       message: 'Employee created successfully',
@@ -177,6 +214,7 @@ const getDashboardStats = async (req, res) => {
 module.exports = {
   getEmployees,
   getEmployee,
+  getMyProfile,
   createEmployee,
   updateEmployee,
   deleteEmployee,

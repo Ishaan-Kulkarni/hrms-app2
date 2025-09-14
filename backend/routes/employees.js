@@ -6,21 +6,27 @@ const {
   createEmployee,
   updateEmployee,
   deleteEmployee,
-  getDashboardStats
+  getDashboardStats,
+  getMyProfile
 } = require('../controllers/employeeController');
 const { auth, authorize } = require('../middleware/auth');
 
 // Apply auth middleware to all routes
 router.use(auth);
 
+// @route   GET /api/employees/my-profile
+// @desc    Get current user's employee profile
+// @access  Private (All authenticated users)
+router.get('/my-profile', getMyProfile);
+
 // @route   GET /api/employees/stats
 // @desc    Get dashboard statistics
-// @access  Private (HR/Admin)
-router.get('/stats', authorize('admin', 'hr'), getDashboardStats);
+// @access  Private (All authenticated users can view basic stats)
+router.get('/stats', getDashboardStats);
 
 // @route   GET /api/employees
 // @desc    Get all employees
-// @access  Private
+// @access  Private (All authenticated users)
 router.get('/', getEmployees);
 
 // @route   POST /api/employees
@@ -30,7 +36,7 @@ router.post('/', authorize('admin', 'hr'), createEmployee);
 
 // @route   GET /api/employees/:id
 // @desc    Get single employee
-// @access  Private
+// @access  Private (All authenticated users)
 router.get('/:id', getEmployee);
 
 // @route   PUT /api/employees/:id

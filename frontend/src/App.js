@@ -7,6 +7,7 @@ import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard/Dashboard';
 import EmployeeList from './components/Employees/EmployeeList';
+import MyProfile from './components/Employees/MyProfile';
 import Sidebar from './components/Layout/Sidebar';
 import PrivateRoute from './components/Common/PrivateRoute';
 
@@ -43,6 +44,20 @@ function App() {
                     <Sidebar />
                     <main className="main-content">
                       <EmployeeList />
+                    </main>
+                  </div>
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/my-profile"
+              element={
+                <PrivateRoute>
+                  <div className="layout">
+                    <Sidebar />
+                    <main className="main-content">
+                      <MyProfile />
                     </main>
                   </div>
                 </PrivateRoute>

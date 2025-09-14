@@ -126,6 +126,13 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   width: 100%;
   max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Larger form for employee registration */
+.auth-form[style*="600px"] {
+  max-width: 600px;
 }
 
 .auth-form h2 {

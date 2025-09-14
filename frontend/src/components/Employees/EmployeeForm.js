@@ -37,7 +37,7 @@ const EmployeeForm = ({ employee, isEdit, onSubmit, onClose }) => {
         department: employee.department || '',
         position: employee.position || '',
         salary: employee.salary || '',
-        hireDate: employee.hireDate ? employee.hireDate.split('T')[0] : '',
+        // hireDate: employee.hireDate ? employee.hireDate.split('T')[0] : '',
         status: employee.status || 'Active',
         address: {
           street: employee.address?.street || '',

@@ -68,11 +68,18 @@ const employeeSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Generate employee ID automatically
+// Generate employee ID automatically (fallback if not provided)
 employeeSchema.pre('save', async function(next) {
+  // Only generate if employeeId is not already set
   if (!this.employeeId) {
-    const count = await mongoose.model('Employee').countDocuments();
-    this.employeeId = `EMP${String(count + 1).padStart(4, '0')}`;
+    try {
+      const count = await mongoose.model('Employee').countDocuments();
+      this.employeeId = `EMP${String(count + 1).padStart(4, '0')}`;
+      console.log('Auto-generated employeeId:', this.employeeId);
+    } catch (error) {
+      console.error('Error generating employeeId:', error);
+      return next(error);
+    }
   }
   next();
 });

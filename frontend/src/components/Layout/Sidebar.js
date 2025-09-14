@@ -7,16 +7,22 @@ const Sidebar = () => {
   const { user } = useAuth();
 
   const menuItems = [
-    { path: '/dashboard', label: 'Dashboard', icon: '📊' },
-    { path: '/employees', label: 'Employees', icon: '👥' },
+    { path: '/dashboard', label: 'Dashboard', icon: '📊', roles: ['admin', 'hr', 'employee'] },
+    { path: '/employees', label: 'Employees', icon: '👥', roles: ['admin', 'hr', 'employee'] },
+    { path: '/my-profile', label: 'My Profile', icon: '👤', roles: ['employee'] },
   ];
+
+  // Filter menu items based on user role
+  const filteredMenuItems = menuItems.filter(item => 
+    item.roles.includes(user?.role)
+  );
 
   return (
     <aside className="sidebar">
       <h2>🏢 HRMS</h2>
       <nav>
         <ul className="sidebar-menu">
-          {menuItems.map((item) => (
+          {filteredMenuItems.map((item) => (
             <li key={item.path}>
               <Link
                 to={item.path}

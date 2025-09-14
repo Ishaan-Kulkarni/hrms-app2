@@ -25,6 +25,9 @@ const EmployeeList = () => {
   const { user } = useAuth();
   const canModify = user?.role === 'admin' || user?.role === 'hr';
 
+  console.log('Current user:', user); // Debug log
+  console.log('Can modify:', canModify); // Debug log
+
   useEffect(() => {
     fetchEmployees();
   }, [search, department, status, currentPage]);
@@ -44,6 +47,7 @@ const EmployeeList = () => {
       setEmployees(response.data.employees);
       setTotalPages(response.data.totalPages);
       setTotal(response.data.total);
+      setError(''); // Clear any previous errors
     } catch (error) {
       setError('Failed to fetch employees');
       console.error('Fetch employees error:', error);
@@ -53,29 +57,33 @@ const EmployeeList = () => {
   };
 
   const handleAdd = () => {
+    console.log('Add employee clicked'); // Debug log
     setSelectedEmployee(null);
     setEditMode(false);
     setShowForm(true);
   };
 
   const handleEdit = (employee) => {
+    console.log('Edit employee clicked:', employee.employeeId); // Debug log
     setSelectedEmployee(employee);
     setEditMode(true);
     setShowForm(true);
   };
 
   const handleView = (employee) => {
+    console.log('View employee clicked:', employee.employeeId); // Debug log
     setSelectedEmployee(employee);
     setShowDetail(true);
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this employee?')) {
+    if (window.confirm('Are you sure you want to delete this employee? This action cannot be undone.')) {
       try {
         await employeeAPI.delete(id);
-        fetchEmployees();
+        setError('');
+        fetchEmployees(); // Refresh the list
       } catch (error) {
-        setError('Failed to delete employee');
+        setError('Failed to delete employee: ' + (error.response?.data?.message || error.message));
         console.error('Delete employee error:', error);
       }
     }
@@ -84,13 +92,17 @@ const EmployeeList = () => {
   const handleFormSubmit = async (employeeData) => {
     try {
       if (editMode && selectedEmployee) {
+        console.log('Updating employee:', selectedEmployee.employeeId); // Debug log
         await employeeAPI.update(selectedEmployee._id, employeeData);
       } else {
+        console.log('Creating new employee'); // Debug log
         await employeeAPI.create(employeeData);
       }
       setShowForm(false);
-      fetchEmployees();
+      setError(''); // Clear any errors
+      fetchEmployees(); // Refresh the list
     } catch (error) {
+      console.error('Form submit error:', error);
       throw new Error(error.response?.data?.message || 'Operation failed');
     }
   };
@@ -110,6 +122,25 @@ const EmployeeList = () => {
       <Header title="Employee Management" />
       
       {error && <div className="error">{error}</div>}
+      
+      {/* Debug info - Remove this after testing */}
+      {process.env.NODE_ENV === 'development' && (
+        <div style={{
+          background: '#f0f8ff',
+          border: '1px solid #ccc',
+          padding: '10px',
+          margin: '10px 0',
+          borderRadius: '4px',
+          fontSize: '12px'
+        }}>
+          <strong>Debug Info:</strong><br/>
+          User Role: {user?.role || 'undefined'}<br/>
+          User Name: {user?.name || 'undefined'}<br/>
+          User Email: {user?.email || 'undefined'}<br/>
+          Can Modify: {canModify ? 'YES' : 'NO'}<br/>
+          Show Add Button: {canModify ? 'SHOULD BE VISIBLE' : 'HIDDEN'}
+        </div>
+      )}
       
       <div className="employee-header">
         <div className="search-filters">
@@ -158,11 +189,40 @@ const EmployeeList = () => {
         </div>
         
         {canModify && (
-          <button onClick={handleAdd} className="btn btn-primary">
-            Add Employee
-          </button>
+          <div style={{ marginLeft: 'auto' }}>
+            <button 
+              onClick={handleAdd} 
+              className="btn btn-primary"
+              style={{ 
+                background: '#667eea',
+                color: 'white',
+                border: 'none',
+                padding: '12px 20px',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontWeight: '500',
+                fontSize: '14px'
+              }}
+            >
+              + Add Employee
+            </button>
+          </div>
         )}
       </div>
+
+      {/* Show role-appropriate message */}
+      {user?.role === 'employee' && (
+        <div style={{
+          background: '#e6fffa',
+          border: '2px solid #81e6d9',
+          padding: '15px',
+          borderRadius: '8px',
+          marginBottom: '20px',
+          color: '#234e52'
+        }}>
+          <p><strong>👀 Employee Directory:</strong> You can view all company employees. HR and Admin users have additional management capabilities.</p>
+        </div>
+      )}
 
       {loading ? (
         <div className="loading">Loading employees...</div>
@@ -228,7 +288,7 @@ const EmployeeList = () => {
                 ) : (
                   <tr>
                     <td colSpan="7" style={{ textAlign: 'center', padding: '20px' }}>
-                      No employees found
+                      {search || department || status ? 'No employees match your filters' : 'No employees found'}
                     </td>
                   </tr>
                 )}
@@ -246,7 +306,7 @@ const EmployeeList = () => {
               </button>
               
               <span>
-                Page {currentPage} of {totalPages} ({total} total)
+                Page {currentPage} of {totalPages} ({total} total employees)
               </span>
               
               <button
@@ -260,19 +320,28 @@ const EmployeeList = () => {
         </>
       )}
 
+      {/* Employee Form Modal */}
       {showForm && (
         <EmployeeForm
           employee={selectedEmployee}
           isEdit={editMode}
           onSubmit={handleFormSubmit}
-          onClose={() => setShowForm(false)}
+          onClose={() => {
+            setShowForm(false);
+            setSelectedEmployee(null);
+            setEditMode(false);
+          }}
         />
       )}
 
+      {/* Employee Detail Modal */}
       {showDetail && selectedEmployee && (
         <EmployeeDetail
           employee={selectedEmployee}
-          onClose={() => setShowDetail(false)}
+          onClose={() => {
+            setShowDetail(false);
+            setSelectedEmployee(null);
+          }}
         />
       )}
     </div>
